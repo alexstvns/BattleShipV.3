@@ -1,7 +1,9 @@
  /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+Alex Stevens
+3/14/2017
+MidTerm
+Csis 123B-3183
+0495503
  */
 package battleship;
 
@@ -31,7 +33,7 @@ public class BattleShip extends Application  {
     private static final int GRIDSIZE  = 16;
     private GridPane pnlPlayer = new GridPane();
     private Label[][] lblPlayer = new Label[GRIDSIZE][GRIDSIZE];
-    private Image[] imgShips = new Image[10];
+   // private Image[] imgShips = new Image[10];
     private Ship[] shipInfo = new Ship[8];
     private char[][] ocean = new char[16][16];    
     private GridPane controlPane = new GridPane();
@@ -39,11 +41,13 @@ public class BattleShip extends Application  {
     private Button showShips = new Button("Show Ships");
     private int missCount = 0;
     private Label infoLabel = new Label();
-    private String miss = "Missed Shots: ";
+    private String miss = "Missed: ";
     
-    private Label[][] cover = new Label[GRIDSIZE][GRIDSIZE];
-    GridPane Hidden = new GridPane();
-    StackPane Board = new StackPane();
+    private Label[][] shipBoard = new Label[GRIDSIZE][GRIDSIZE];
+    private Label[][] hitShips = new Label[GRIDSIZE][GRIDSIZE];
+    
+  //  GridPane Hidden = new GridPane();
+    //StackPane Board = new StackPane();
     
     
     @Override
@@ -51,7 +55,7 @@ public class BattleShip extends Application  {
                 
         BorderPane root = new BorderPane();
                 
-        Scene scene = new Scene(root, 290, 315);
+        Scene scene = new Scene(root, 290,390);
         
         primaryStage.setTitle("Battleship");
         primaryStage.setScene(scene);
@@ -60,10 +64,10 @@ public class BattleShip extends Application  {
         //this.initOcean();
         //this.createPlayerPanel();
         this.createOptionPane();
-        Board.getChildren().addAll(pnlPlayer,Hidden);
-        //createShips();
-        root.setCenter(Board);
+        root.setCenter(pnlPlayer);
         root.setTop(controlPane);
+        //createShips();
+     
         //placeShips();
       
         
@@ -82,7 +86,7 @@ public class BattleShip extends Application  {
             @Override
             public void handle(ActionEvent event) {
             
-                revealShips();
+              revealShips();
             }
             
         });
@@ -107,7 +111,7 @@ public class BattleShip extends Application  {
     {
       controlPane.setStyle("-fx-background-color:BLACK;");
        
-       controlPane.setHgap(30);
+       controlPane.setHgap(10);
        
        infoLabel.setText(miss+""+missCount);
        controlPane.add(infoLabel,0,0);
@@ -142,6 +146,109 @@ public class BattleShip extends Application  {
                lblPlayer[row][col].setMaxSize(16.0, 16.0);
                lblPlayer[row][col].setStyle("-fx-border-width:1;-fx-border-color:black;");
                
+               
+               hitShips[row][col] = new Label();
+               shipBoard[row][col] = new Label();
+               
+                pnlPlayer.add(lblPlayer[row][col], col, row);      
+
+               
+               lblPlayer[row][col].setOnMousePressed(new EventHandler<MouseEvent>()
+               {
+                   @Override
+                   public void handle(MouseEvent t) {
+                       
+                       for(int row=0;row<GRIDSIZE;row++){
+                           for(int col=0;col<GRIDSIZE;col++){
+                               
+                               Label clicked = (Label) t.getSource();
+                               
+                               if(clicked == lblPlayer[row][col]){
+                                   
+                                   char Seeker = Character.toUpperCase(ocean[row][col]);
+                                   
+                                   
+                                   switch(Seeker){
+                                       
+                                       case 'O':
+                                           lblPlayer[row][col].setGraphic(new ImageView("file:Images\\batt102.gif"));
+                                           missCount++;
+                                           infoLabel.setText(miss+""+missCount);
+                                         break;
+                                         
+                                       case 'B': 
+                                       case 'F':
+                                       case 'M':
+                                       case 'C':
+                                          ocean[row][col]='H';
+                                          lblPlayer[row][col].setGraphic(hitShips[row][col].getGraphic());
+                                          break;
+                                           
+                                       
+                                   }
+                                   
+                               }
+                               
+                           }
+                           
+                           
+                       }
+                   
+                       
+                   }
+                   
+               });
+               
+               
+               lblPlayer[row][col].setOnMouseReleased(new EventHandler<MouseEvent>(){
+                   @Override
+                   public void handle(MouseEvent r) {
+                       for(int row=0;row<GRIDSIZE;row++){
+                           for(int col=0;col<GRIDSIZE;col++){
+                               
+                               Label Clicked = (Label)r.getSource();
+                               
+                               if(Clicked == lblPlayer[row][col]){
+                                   
+                                   
+                               char Seeker = Character.toUpperCase(ocean[row][col]);
+                                   
+                                   
+                                   switch(Seeker){
+                                       
+                                       case 'O':
+                                           lblPlayer[row][col].setGraphic(new ImageView("file:Images\\batt102.gif"));
+                                           
+                                         break;
+                                         
+                                       case 'B':
+                                       case 'F':
+                                       case 'M':
+                                       case 'C':
+                                           lblPlayer[row][col].setGraphic(hitShips[row][col].getGraphic());
+                                          break;
+                                           
+                                       
+                                   }
+                                   
+                                   
+                               }
+                               
+                           }
+                       }
+                   
+                       
+                   }
+               
+               
+               
+               
+           });
+           }
+       }
+    }
+               
+             /*  
                cover[row][col] = new Label();
                Image coverImg = new Image("file:Images\\batt101.gif");
                cover[row][col].setGraphic(new ImageView(coverImg));
@@ -170,6 +277,7 @@ public class BattleShip extends Application  {
                                         missCount++;
                                         infoLabel.setText(miss+""+missCount); 
                                         cover[row][col].setVisible(false);
+                                        
                                         break;
                                         
                                        case 'F':
@@ -177,7 +285,10 @@ public class BattleShip extends Application  {
                                        case 'M':
                                        case 'C':
                                            lblPlayer[row][col].setGraphic(new ImageView("file:Images\\batt103.gif"));
+                                         
                                         cover[row][col].setVisible(false);
+                                        
+                                        
                                         break;
                                            
                                        
@@ -203,31 +314,39 @@ public class BattleShip extends Application  {
        }
       
     }
+      */         
     private void revealShips(){
         
         for(int row=0;row<GRIDSIZE;row++){
          for(int col=0;col<GRIDSIZE;col++){
              
-             cover[row][col].setVisible(false);
+             char Seeker = Character.toUpperCase(ocean[row][col]);
+             
+             switch(Seeker){
+             
+                 case 'B':
+                 case 'F':
+                 case 'M':
+                 case 'C':
+                     lblPlayer[row][col].setGraphic(shipBoard[row][col].getGraphic());
+                    
+             
+         }
         }
         }
     }
   
+             
     
     private void createShips()
-    {
+   {
         //this.loadShipImages();   // don't need since img's are loaded in ship.java
         this.createShipInfo();
-    }
-    /*
-    private void loadShipImages()   // moved similar method to Ship.java
-    {
-        for(int i = 0; i < 10 ; i++)
-        {
-            imgShips[i] = new Image("file:Images\\batt" + (i + 1) + ".gif");
-        }
-    }
-    */
+   }
+    
+   
+  
+   
     private void createShipInfo()
     {
         //Start with the frigate, we create 2 of them here but will place 3 total randomly it as two images
@@ -290,15 +409,22 @@ public class BattleShip extends Application  {
                 }
                 // got a clear path, let put the ship on the ocean
                // int shipPieces[] = si.getShipPieces();
-               Image[] hBoat = si.retShipH();
+               Image[] hBoat = si.retShipH();   //houses the boat piece image labels
                Image[] vBoat = si.retShipV();
+               
+               Image[] hDBoat = si.getDestH();  // houses the hit ships image labels
+               Image[] vDBoat= si.getDestV();
                 if(si.Direction == 'H')  // place horizontal
                 {
                         if(direction == 1)
                         {
                             for(int i = col, j = 0; i < col + si.length(); i++, j++)
-                            {                                                          
-                                lblPlayer[row][i].setGraphic(new ImageView(hBoat[j]));
+                            {    
+                                
+                                
+                                shipBoard[row][i].setGraphic(new ImageView(hBoat[j]));
+                                hitShips[row][i].setGraphic(new ImageView(hDBoat[j]));
+                                //lblPlayer[row][i].setGraphic(new ImageView(hBoat[j]));
                                 String name = si.getName();
                                 ocean[row][i] = name.charAt(0);
                             }
@@ -307,7 +433,11 @@ public class BattleShip extends Application  {
                         {
                             for(int i = col + si.length(), j = 0 ; i > col; i--, j++)
                             {
-                                lblPlayer[row][i].setGraphic(new ImageView(hBoat[j]));	
+                                
+                            shipBoard[row][i].setGraphic(new ImageView(hBoat[j]));
+                                hitShips[row][i].setGraphic(new ImageView(hDBoat[j]));    
+                            
+                               // lblPlayer[row][i].setGraphic(new ImageView(hBoat[j]));	
                                 String name = si.getName();
                                 ocean[row][i] = name.charAt(0);
                             }
@@ -319,7 +449,10 @@ public class BattleShip extends Application  {
                         {
                             for(int i = row, j = 0; i < row + si.length(); i++, j++)
                             {
-                                lblPlayer[i][col].setGraphic(new ImageView(vBoat[j]));	
+                                
+                                shipBoard[i][col].setGraphic(new ImageView(vBoat[j]));
+                                hitShips[i][col].setGraphic(new ImageView(vDBoat[j]));
+                               // lblPlayer[i][col].setGraphic(new ImageView(vBoat[j]));	
                                 String name = si.getName();
                                 ocean[i][col] = name.charAt(0);
                             }
@@ -328,7 +461,10 @@ public class BattleShip extends Application  {
                         {
                                 for(int i = row + si.length(), j = 0; i > row; i--, j++)
                                 {
-                                    lblPlayer[i][col].setGraphic(new ImageView(vBoat[j]));	
+                                    
+                                 shipBoard[i][col].setGraphic(new ImageView(vBoat[j]));
+                                hitShips[i][col].setGraphic(new ImageView(vDBoat[j]));
+                                    //lblPlayer[i][col].setGraphic(new ImageView(vBoat[j]));	
                                     String name = si.getName();
                                     ocean[i][col] = name.charAt(0);
                                 }
@@ -432,13 +568,7 @@ public class BattleShip extends Application  {
                 return 0;   // No place to move			
 
     }
-    
-
-    
-    
-    
-    
-
+ 
     /**
      * @param args the command line arguments
      */
